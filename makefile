@@ -11,6 +11,7 @@ CLASSES = \
 	Fingerprint.java \
 	StopWatch.java \
 	LamportQueue.java \
+	RangeSkipList.java \
 	AccessControl.java \
 	Filter.java \
 	Worker.java \
