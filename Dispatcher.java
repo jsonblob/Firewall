@@ -1,35 +1,49 @@
+import java.util.concurrent.atomic.*;
+
 @SuppressWarnings("unchecked")
 class Dispatcher implements Runnable {
   PaddedPrimitiveNonVolatile<Boolean> done;
-  final PacketSource pkt;
+  PaddedPrimitiveNonVolatile<Integer> inFlight;
+  PaddedPrimitive<Integer> inFlightMemFence;
+  final PacketGenerator pktGen;
   long totalPackets = 0;
   final int numSources;
-  final boolean uniformBool;
   LamportQueue[] queues;
+  AtomicInteger tinFlight;
   public Dispatcher(
-    PaddedPrimitiveNonVolatile<Boolean> done, 
-    PacketSource pkt,
-    boolean uniformBool,
+    PaddedPrimitiveNonVolatile<Boolean> done,
+    PaddedPrimitiveNonVolatile<Integer> inFlight,
+    PaddedPrimitive<Integer> inFlightMemFence,
+    PacketGenerator pktGen,
     int numSources,
-    LamportQueue[] queues) {
+    LamportQueue[] queues,
+    AtomicInteger tinFlight
+  ) {
     this.done = done;
-    this.pkt = pkt;
-    this.uniformBool = uniformBool;
+    this.inFlight = inFlight;
+    this.inFlightMemFence = inFlightMemFence;
+    this.pktGen = pktGen;
     this.numSources = numSources;
     this.queues = queues;
+    this.tinFlight = tinFlight;
   }
   public void run() {
     Packet tmp;
     while( !done.value ) {
       for( int i = 0; i < numSources; i++ ) {
-        if( uniformBool )
-          tmp = pkt.getUniformPacket(i);
-        else
-          tmp = pkt.getExponentialPacket(i);
-        try {
-          queues[i].enq(tmp);
-          totalPackets++;
-        } catch (FullException e) {;}
+        tmp = pktGen.getPacket();
+        boolean delivered = false;
+        while( !delivered && !done.value ) {
+          try {
+            while (tinFlight.get() >= 256 && !done.value) {;}
+            tinFlight.getAndIncrement();
+            inFlight.value++;
+            inFlightMemFence.value++;
+            queues[i].enq(tmp);
+            totalPackets++;
+            delivered = true;
+          } catch (FullException e) {;}
+        }
       }
     }
   }

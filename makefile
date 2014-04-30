@@ -1,4 +1,4 @@
-JFLAGS=
+JFLAGS=-cp :.:./deuce/
 JC= javac
 .SUFFIXES: .java .class
 .java.class:
