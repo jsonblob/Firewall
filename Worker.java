@@ -33,16 +33,26 @@ class SerialPacketWorker implements PacketWorker {
       tmp = pktGen.getPacket();
       switch (tmp.type) {
         case ConfigPacket:
+          // System.out.println("--- CONFIG ---");
           Config conf = tmp.config;
+          // System.out.println(conf.address);
+          // System.out.println(conf.personaNonGrata);
+          // System.out.println(conf.addressBegin);
+          // System.out.println(conf.addressEnd);
+          // System.out.println(conf.acceptingRange);
           setConfig(conf);
           break;
         case DataPacket:
+          // System.out.println("--- DATA ---");
           Header header = tmp.header;
-          if (!(!ac.getSendPerm(header.source) && ac.getAcceptPerm(header.dest, header.source))) {
+          if (ac.getSendPerm(header.source) || !ac.getAcceptPerm(header.dest, header.source)) {
             break;
           }
+          // System.out.println(ac.getSendPerm(header.source));
+          // System.out.println(ac.getAcceptPerm(header.dest, header.source));
           Body body = tmp.body;
           long bucket = residue.getFingerprint(body.iterations, body.seed);
+          // System.out.println(bucket);
           filter.setBucket((int) bucket);
           fingerprint += bucket;
           break;

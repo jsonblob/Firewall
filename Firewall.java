@@ -57,8 +57,8 @@ class SerialFirewall {
     System.out.println("count: " + totalCount);
     System.out.println("time: " + timer.getElapsedTime());
     System.out.println(totalCount/timer.getElapsedTime() + " pkts / ms");
-    filter.printHistogram();
-    ac.printSendPerms();
+    // filter.printHistogram();
+    // ac.printSendPerms();
   }
 }
 
