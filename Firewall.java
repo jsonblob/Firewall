@@ -58,6 +58,7 @@ class SerialFirewall {
       workerThread.join();
     } catch (InterruptedException ignore) {;}      
     timer.stopTimer();
+    //System.out.println(ac.R[0].list);
     final long totalCount = workerData.totalPackets;
     System.out.println("count: " + totalCount);
     System.out.println("time: " + timer.getElapsedTime());
@@ -155,6 +156,7 @@ class ParallelSTMFirewall {
     for (int i = 0; i < numSources; i++) {
       totalCount += workersData[i].totalPackets;
     }
+
     System.out.println("count: " + totalCount);
     System.out.println("time: " + timer.getElapsedTime());
     System.out.println(totalCount/timer.getElapsedTime() + " pkts / ms");

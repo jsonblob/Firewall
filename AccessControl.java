@@ -5,7 +5,7 @@ import java.util.HashMap;
 class SerialAccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	private RangeSkipList[] R;
+	public RangeSkipList[] R;
 
 	public SerialAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
@@ -25,7 +25,7 @@ class SerialAccessControl {
 	}
 
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
-		if (perm)
+		if (!perm)
 			R[address].put(addressBegin, addressEnd);
 		else
 			R[address].remove(addressBegin, addressEnd);
@@ -36,7 +36,7 @@ class SerialAccessControl {
 	}
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		return R[address].contains(Integer.valueOf(checkAdd));
+		return !R[address].contains(Integer.valueOf(checkAdd));
 	}
 
 	public void printSendPerms() {
