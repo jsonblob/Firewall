@@ -31,6 +31,9 @@ class SerialFirewall {
     SerialAccessControl ac = new SerialAccessControl(numAddressesLog);
 
     int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
+    if (numAddressesLog == 16) {
+        total = (int) Math.pow((double) (1 << (numAddressesLog-1)), 1.5);
+    }
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
         ac.setSendPerm(conf.address, conf.personaNonGrata);
