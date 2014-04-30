@@ -1,19 +1,21 @@
 import org.deuce.Atomic;
+import java.util.HashMap;
 
+@SuppressWarnings("unchecked")
 class SerialAccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	private Boolean[][] R;
+	private HashMap[] R;
 
 	public SerialAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
-		R = new Boolean[total][total];
+		R = new HashMap[total];
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
 			for (int j = 0; j < total; j++) {
-				R[i][j] = false;
+				R[i] = new HashMap<Integer, Boolean>();
 			}
 		}
 	}
@@ -24,7 +26,10 @@ class SerialAccessControl {
 
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
 		for (int i = addressBegin; i < addressEnd; i++) {
-			R[address][i] = perm;
+			if (!perm)
+				R[address].put(i, null);
+			else
+				R[address].remove(i);
 		}
 	}
 
@@ -33,7 +38,7 @@ class SerialAccessControl {
 	}
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		return R[address][checkAdd];
+		return !R[address].containsKey(Integer.valueOf(checkAdd));
 	}
 
 	public void printSendPerms() {
@@ -45,20 +50,21 @@ class SerialAccessControl {
 }
 
 
+@SuppressWarnings("unchecked")
 class ParallelSTMAccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	private Boolean[][] R;
+	private HashMap[] R;
 
 	public ParallelSTMAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
-		R = new Boolean[total][total];
+		R = new HashMap[total];
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
 			for (int j = 0; j < total; j++) {
-				R[i][j] = false;
+				R[i] = new HashMap<Integer, Boolean>();
 			}
 		}
 	}
@@ -71,7 +77,10 @@ class ParallelSTMAccessControl {
 	@Atomic
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
 		for (int i = addressBegin; i < addressEnd; i++) {
-			R[address][i] = perm;
+			if (!perm)
+				R[address].put(i, null);
+			else
+				R[address].remove(i);
 		}
 	}
 
@@ -82,7 +91,7 @@ class ParallelSTMAccessControl {
 
 	@Atomic
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		return R[address][checkAdd];
+		return !R[address].containsKey(checkAdd);
 	}
 
 	public void printSendPerms() {
