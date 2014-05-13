@@ -57,43 +57,24 @@ class ParallelSTMFilter {
 class ParallelFilter {
 	private final int total;
 	private int[] histogram;
-	private ReentrantReadWriteLock[] locks;
+	private MultiLock multiLock;
 
 	public ParallelFilter() {
 		total = 1 << 16;
 		histogram = new int[total];
-		locks = new ReentrantReadWriteLock[total];
-		for (int i = 0; i < total; i++) {
-			locks[i] = new ReentrantReadWriteLock();
-		}
-	}
-
-	public final void acquireRead(int address) {
-		locks[address].readLock().lock();
-	}
-
-	public final void releaseRead(int address) {
-		locks[address].readLock().unlock();
-	}
-
-	public final void acquireWrite(int address) {
-		locks[address].writeLock().lock();
-	}
-
-	public final void releaseWrite(int address) {
-		locks[address].writeLock().unlock();
+		multiLock = new MultiLock(total);
 	}
 
 	public void setBucket(int address) {
-		acquireWrite(address);
+		multiLock.acquireWrite(address);
 		histogram[address]++;
-		releaseWrite(address);
+		multiLock.releaseWrite(address);
 	}
 
 	public int getBucket(int address) {
-		acquireRead(address);
+		multiLock.acquireRead(address);
 		int val = histogram[address];
-		releaseRead(address);
+		multiLock.releaseRead(address);
 		return val;
 	}
 

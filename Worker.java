@@ -142,3 +142,80 @@ class ParallelSTMPacketWorker implements PacketWorker {
     }
   }  
 }
+
+class ParallelPacketWorker implements PacketWorker {
+  PaddedPrimitiveNonVolatile<Boolean> done;
+  PaddedPrimitiveNonVolatile<Integer> inFlight;
+  PaddedPrimitive<Integer> inFlightMemFence;
+  ParallelAccessControl ac;
+  ParallelFilter filter;
+  int workerID;
+  LamportQueue[] queues;
+  AtomicInteger tinFlight;
+  final Fingerprint residue = new Fingerprint();
+  long fingerprint = 0;
+  long totalPackets = 0;
+  public ParallelPacketWorker(
+    PaddedPrimitiveNonVolatile<Boolean> done,
+    PaddedPrimitiveNonVolatile<Integer> inFlight,
+    PaddedPrimitive<Integer> inFlightMemFence,
+    ParallelAccessControl ac,
+    ParallelFilter filter,
+    int workerID,
+    LamportQueue[] queues,
+    AtomicInteger tinFlight
+  ) {
+    this.done = done;
+    this.inFlight = inFlight;
+    this.inFlightMemFence = inFlightMemFence;
+    this.ac = ac;
+    this.filter = filter;
+    this.workerID = workerID;
+    this.queues = queues;
+    this.tinFlight = tinFlight;
+  }
+
+  public void setConfig(Config conf) {
+    ac.setSendPerm(conf.address, conf.personaNonGrata);
+    ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
+  }
+  
+  public void run() {
+    Packet tmp;
+    while( !done.value ) {
+      try {
+        tmp = (Packet) queues[workerID].deq();
+        tinFlight.getAndDecrement();
+        inFlight.value--;
+        inFlightMemFence.value--;
+        switch (tmp.type) {
+          case ConfigPacket:
+            // System.out.println("--- CONFIG ---");
+            Config conf = tmp.config;
+            // System.out.println(conf.address);
+            // System.out.println(conf.personaNonGrata);
+            // System.out.println(conf.addressBegin);
+            // System.out.println(conf.addressEnd);
+            // System.out.println(conf.acceptingRange);
+            setConfig(conf);
+            break;
+          case DataPacket:
+            // System.out.println("--- DATA ---");
+            Header header = tmp.header;
+            if (!ac.isAllowed(header)) {
+              break;
+            }
+            // System.out.println(ac.getSendPerm(header.source));
+            // System.out.println(ac.getAcceptPerm(header.dest, header.source));
+            Body body = tmp.body;
+            long bucket = residue.getFingerprint(body.iterations, body.seed);
+            // System.out.println(bucket);
+            filter.setBucket((int) bucket);
+            fingerprint += bucket;
+            break;
+        }
+        totalPackets++;
+      } catch (EmptyException e) {;}
+    }
+  }  
+}
