@@ -13,9 +13,11 @@ CLASSES = \
 	LamportQueue.java \
 	MultiLock.java \
 	RangeSkipList.java \
+	Cache.java \
 	AccessControl.java \
 	Filter.java \
 	Worker.java \
+	Initializer.java \
 	Firewall.java \
 	LamportQueue.java \
 

@@ -15,16 +15,20 @@ class RangeSkipList {
 	}
 
 	private int findLow(int addressBegin) {
-		int lowK = list.floorKey(addressBegin);
-		int lowVal = list.get(lowK);
+		Integer lowK = list.floorKey(addressBegin);
+        if (lowK == null)
+            return addressBegin;
+		Integer lowVal = list.get(lowK);
 		if (addressBegin <= lowVal)
 			return lowK;
 		return addressBegin;
 	}
 
 	private int findHigh(int addressEnd) {
-        int lowK = list.floorKey(addressEnd);
-        int lowVal = list.get(lowK);
+        Integer lowK = list.floorKey(addressEnd);
+        if (lowK == null)
+            return addressEnd;
+        Integer lowVal = list.get(lowK);
         if (addressEnd < lowVal)
             return lowVal;
 		int highK = list.ceilingKey(addressEnd);
@@ -35,7 +39,9 @@ class RangeSkipList {
 	}
 
 	private void removeBetween(int addressBegin, int addressEnd) {
-		int k = list.ceilingKey(addressBegin);
+		Integer k = list.ceilingKey(addressBegin);
+        if (k == null)
+            return;
 		while (k >= addressBegin && k < addressEnd) {
             if (k == list.get(k)) {
                 list.remove(k);

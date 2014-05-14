@@ -1,21 +1,28 @@
 import org.deuce.Atomic;
 import java.util.HashMap;
 
+public interface AccessControl {
+  public void setSendPerm(int address, boolean perm);
+  public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm);
+  public boolean getSendPerm(int address);
+  public boolean getAcceptPerm(int address, int checkAdd);
+} 
+
 @SuppressWarnings("unchecked")
-class SerialAccessControl {
+class SerialAccessControl implements AccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	public RangeSkipList[] R;
+	public HashMap[] R;
 
 	public SerialAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
-		R = new RangeSkipList[total];
+		R = new HashMap[total];
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
 			for (int j = 0; j < total; j++) {
-				R[i] = new RangeSkipList();
+				R[i] = new HashMap<Integer, Boolean>();
 			}
 		}
 	}
@@ -25,18 +32,23 @@ class SerialAccessControl {
 	}
 
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
-		if (!perm)
-			R[address].put(addressBegin, addressEnd);
-		else
-			R[address].remove(addressBegin, addressEnd);
+		for (int i = addressBegin; i < addressEnd; i++) {
+			if (!perm)
+				R[address].put(i, null);
+			else
+				R[address].remove(i);
+		}
 	}
 
 	public boolean getSendPerm(int address) {
-		return PNG[address];
+		boolean val = PNG[address];
+		return val;
 	}
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		return !R[address].contains(Integer.valueOf(checkAdd));
+		boolean val = false;
+		val = !R[address].containsKey(checkAdd);
+		return val;
 	}
 
 	public void printSendPerms() {
@@ -49,7 +61,7 @@ class SerialAccessControl {
 
 
 @SuppressWarnings("unchecked")
-class ParallelSTMAccessControl {
+class ParallelSTMAccessControl implements AccessControl {
 	private final int total;
 	private Boolean[] PNG;
 	private HashMap[] R;
@@ -100,9 +112,10 @@ class ParallelSTMAccessControl {
 	}
 }
 
-class ParallelAccessControl {
+class ParallelAccessControl implements AccessControl {
 	private final int total;
 	private Boolean[] PNG;
+	private Cache cache;
 	public RangeSkipList[] R;
 	private MultiLock multiLock;
 
@@ -110,6 +123,7 @@ class ParallelAccessControl {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
 		R = new RangeSkipList[total];
+		cache = new Cache(numAddressesLog);
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
@@ -132,6 +146,9 @@ class ParallelAccessControl {
 			R[address].put(addressBegin, addressEnd);
 		else
 			R[address].remove(addressBegin, addressEnd);
+			for (int i = addressBegin; i < addressEnd; i++) {
+				cache.remove(address + "-" + i);
+			}
 		multiLock.releaseWrite(address);
 	}
 
@@ -143,10 +160,15 @@ class ParallelAccessControl {
 	}
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		multiLock.acquireRead(address);
-		boolean res = !R[address].contains(Integer.valueOf(checkAdd));
-		multiLock.releaseRead(address);
-		return res;
+		String key = address + "-" + checkAdd;
+		Boolean val = cache.get(key);
+		if (val == null) {
+			multiLock.acquireRead(address);
+			val = !R[address].contains(Integer.valueOf(checkAdd));
+			cache.put(key, val);
+			multiLock.releaseRead(address);
+		}
+		return val;
 	}
 
 	public boolean isAllowed(Header header) {

@@ -30,15 +30,17 @@ class SerialFirewall {
     );
     SerialAccessControl ac = new SerialAccessControl(numAddressesLog);
 
-    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
-    if (numAddressesLog == 16) {
-        total = (int) Math.pow((double) (1 << (numAddressesLog-1)), 1.5);
-    }
+    int cap = Math.min(numAddressesLog, 14);
+    int total = (int) Math.pow((double) (1 << cap), 1.5);
+
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
+
+    // Initializer ini = new Initializer(pktGen, ac, total, numSources);
+    // ini.init();
 
     SerialFilter filter = new SerialFilter();
     PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
@@ -115,7 +117,9 @@ class ParallelSTMFirewall {
 
     ParallelSTMAccessControl ac = new ParallelSTMAccessControl(numAddressesLog);
 
-    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
+    int cap = Math.min(numAddressesLog, 14);
+    int total = (int) Math.pow((double) (1 << cap), 1.5);
+
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
         ac.setSendPerm(conf.address, conf.personaNonGrata);
@@ -209,13 +213,18 @@ class ParallelFirewall {
     }
 
     ParallelAccessControl ac = new ParallelAccessControl(numAddressesLog);
+    
+    int cap = Math.min(numAddressesLog, 14);
+    int total = (int) Math.pow((double) (1 << cap), 1.5);
 
-    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
+
+    // Initializer ini = new Initializer(pktGen, ac, total, numSources);
+    // ini.init();
 
     ParallelFilter filter = new ParallelFilter();
 
