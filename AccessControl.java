@@ -12,16 +12,16 @@ public interface AccessControl {
 class SerialAccessControl implements AccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	public HashMap[] R;
+	public RangeSkipList[] R;
 
 	public SerialAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
-		R = new HashMap[total];
+		R = new RangeSkipList[total];
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
-			R[i] = new HashMap<Integer, Boolean>();
+			R[i] = new RangeSkipList();
 		}
 	}
 
@@ -30,12 +30,10 @@ class SerialAccessControl implements AccessControl {
 	}
 
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
-		for (int i = addressBegin; i < addressEnd; i++) {
-			if (!perm)
-				R[address].put(i, null);
-			else
-				R[address].remove(i);
-		}
+		if (!perm)
+			R[address].put(addressBegin, addressEnd);
+		else
+			R[address].remove(addressBegin, addressEnd);
 	}
 
 	public boolean getSendPerm(int address) {
@@ -45,7 +43,7 @@ class SerialAccessControl implements AccessControl {
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
 		boolean val = false;
-		val = !R[address].containsKey(checkAdd);
+		val = !R[address].contains(checkAdd);
 		return val;
 	}
 
