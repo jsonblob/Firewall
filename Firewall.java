@@ -39,6 +39,8 @@ class SerialFirewall {
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
 
+    System.out.println("Initialization Done");
+    
     // Initializer ini = new Initializer(pktGen, ac, total, numSources);
     // ini.init();
 
@@ -125,6 +127,8 @@ class ParallelSTMFirewall {
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
+
+    System.out.println("Initialization Done");
 
     ParallelSTMFilter filter = new ParallelSTMFilter();
 
@@ -213,7 +217,7 @@ class ParallelFirewall {
     }
 
     ParallelAccessControl ac = new ParallelAccessControl(numAddressesLog);
-    
+
     int cap = Math.min(numAddressesLog, 14);
     int total = (int) Math.pow((double) (1 << cap), 1.5);
 
@@ -222,6 +226,8 @@ class ParallelFirewall {
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
+
+    System.out.println("Initialization Done");
 
     // Initializer ini = new Initializer(pktGen, ac, total, numSources);
     // ini.init();

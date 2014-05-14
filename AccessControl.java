@@ -146,9 +146,10 @@ class ParallelAccessControl implements AccessControl {
 			R[address].put(addressBegin, addressEnd);
 		else
 			R[address].remove(addressBegin, addressEnd);
-			for (int i = addressBegin; i < addressEnd; i++) {
-				cache.remove(address + "-" + i);
-			}
+		
+		for (int i = addressBegin; i < addressEnd; i++) {
+			cache.remove(address + "-" + i);
+		}
 		multiLock.releaseWrite(address);
 	}
 
