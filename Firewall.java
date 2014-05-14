@@ -221,11 +221,11 @@ class ParallelFirewall {
     int cap = Math.min(numAddressesLog, 12);
     int total = (int) Math.pow((double) (1 << cap), 1.5);
 
-    for (int i = 0; i < total; i++) {
-        Config conf = pktGen.getConfigPacket().config;
-        ac.setSendPerm(conf.address, conf.personaNonGrata);
-        ac.setAcceptPermInit(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
-    }
+    // for (int i = 0; i < total; i++) {
+    //     Config conf = pktGen.getConfigPacket().config;
+    //     ac.setSendPerm(conf.address, conf.personaNonGrata);
+    //     ac.setAcceptPermInit(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
+    // }
 
     System.out.println("Initialization Done");
 
