@@ -127,9 +127,7 @@ class ParallelAccessControl implements AccessControl {
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
-			for (int j = 0; j < total; j++) {
-				R[i] = new RangeSkipList();
-			}
+			R[i] = new RangeSkipList();
 		}
 		multiLock = new MultiLock(total);
 	}
