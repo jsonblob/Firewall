@@ -140,13 +140,22 @@ class ParallelAccessControl implements AccessControl {
 		multiLock.releaseWrite(address);
 	}
 
+	public void setAcceptPermInit(int address, int addressBegin, int addressEnd, boolean perm) {
+		multiLock.acquireWrite(address);
+		if (!perm)
+			R[address].put(addressBegin, addressEnd);
+		else
+			R[address].remove(addressBegin, addressEnd);
+		multiLock.releaseWrite(address);
+	}
+
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
 		multiLock.acquireWrite(address);
 		if (!perm)
 			R[address].put(addressBegin, addressEnd);
 		else
 			R[address].remove(addressBegin, addressEnd);
-		
+
 		for (int i = addressBegin; i < addressEnd; i++) {
 			cache.remove(address + "-" + i);
 		}

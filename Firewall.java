@@ -40,7 +40,7 @@ class SerialFirewall {
     }
 
     System.out.println("Initialization Done");
-    
+
     // Initializer ini = new Initializer(pktGen, ac, total, numSources);
     // ini.init();
 
@@ -218,13 +218,13 @@ class ParallelFirewall {
 
     ParallelAccessControl ac = new ParallelAccessControl(numAddressesLog);
 
-    int cap = Math.min(numAddressesLog, 14);
+    int cap = Math.min(numAddressesLog, 12);
     int total = (int) Math.pow((double) (1 << cap), 1.5);
 
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
         ac.setSendPerm(conf.address, conf.personaNonGrata);
-        ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
+        ac.setAcceptPermInit(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
 
     System.out.println("Initialization Done");
