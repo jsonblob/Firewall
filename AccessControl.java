@@ -21,9 +21,7 @@ class SerialAccessControl implements AccessControl {
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
-			for (int j = 0; j < total; j++) {
-				R[i] = new HashMap<Integer, Boolean>();
-			}
+			R[i] = new HashMap<Integer, Boolean>();
 		}
 	}
 
@@ -73,9 +71,7 @@ class ParallelSTMAccessControl implements AccessControl {
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
-			for (int j = 0; j < total; j++) {
-				R[i] = new HashMap<Integer, Boolean>();
-			}
+			R[i] = new HashMap<Integer, Boolean>();
 		}
 	}
 

@@ -30,8 +30,7 @@ class SerialFirewall {
     );
     SerialAccessControl ac = new SerialAccessControl(numAddressesLog);
 
-    int cap = Math.min(numAddressesLog, 14);
-    int total = (int) Math.pow((double) (1 << cap), 1.5);
+    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
 
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
@@ -119,8 +118,7 @@ class ParallelSTMFirewall {
 
     ParallelSTMAccessControl ac = new ParallelSTMAccessControl(numAddressesLog);
 
-    int cap = Math.min(numAddressesLog, 14);
-    int total = (int) Math.pow((double) (1 << cap), 1.5);
+    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
 
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;
@@ -218,8 +216,7 @@ class ParallelFirewall {
 
     ParallelAccessControl ac = new ParallelAccessControl(numAddressesLog);
 
-    int cap = Math.min(numAddressesLog, 16);
-    int total = (int) Math.pow((double) (1 << cap), 1.5);
+    int total = (int) Math.pow((double) (1 << numAddressesLog), 1.5);
 
     for (int i = 0; i < total; i++) {
         Config conf = pktGen.getConfigPacket().config;

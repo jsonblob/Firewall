@@ -27,6 +27,7 @@ class Cache {
 			return;
 		Boolean val = entries.get(key).getReference();
 		entries.get(key).attemptMark(val, true);
+		entries.remove(key);
 		invCount.getAndIncrement();
 		shouldPrune();
 	}
