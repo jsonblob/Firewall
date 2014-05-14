@@ -161,13 +161,13 @@ class ParallelAccessControl implements AccessControl {
 
 	public boolean getAcceptPerm(int address, int checkAdd) {
 		String key = address + "-" + checkAdd;
+		multiLock.acquireRead(address);
 		Boolean val = cache.get(key);
 		if (val == null) {
-			multiLock.acquireRead(address);
 			val = !R[address].contains(Integer.valueOf(checkAdd));
 			cache.put(key, val);
-			multiLock.releaseRead(address);
 		}
+		multiLock.releaseRead(address);
 		return val;
 	}
 
