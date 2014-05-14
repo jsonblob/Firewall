@@ -60,16 +60,16 @@ class SerialAccessControl implements AccessControl {
 class ParallelSTMAccessControl implements AccessControl {
 	private final int total;
 	private Boolean[] PNG;
-	private HashMap[] R;
+	private RangeSkipList[] R;
 
 	public ParallelSTMAccessControl(int numAddressesLog) {
 		total = (1 << numAddressesLog);
 		PNG = new Boolean[total];
-		R = new HashMap[total];
+		R = new RangeSkipList[total];
 
 		for (int i = 0; i < total; i++) {
 			PNG[i] = true;
-			R[i] = new HashMap<Integer, Boolean>();
+			R[i] = new RangeSkipList();
 		}
 	}
 
@@ -80,12 +80,10 @@ class ParallelSTMAccessControl implements AccessControl {
 
 	@Atomic
 	public void setAcceptPerm(int address, int addressBegin, int addressEnd, boolean perm) {
-		for (int i = addressBegin; i < addressEnd; i++) {
-			if (!perm)
-				R[address].put(i, null);
-			else
-				R[address].remove(i);
-		}
+		if (!perm)
+			R[address].put(addressBegin, addressEnd);
+		else
+			R[address].remove(addressBegin, addressEnd);
 	}
 
 	@Atomic
@@ -95,7 +93,7 @@ class ParallelSTMAccessControl implements AccessControl {
 
 	@Atomic
 	public boolean getAcceptPerm(int address, int checkAdd) {
-		return !R[address].containsKey(checkAdd);
+		return !R[address].contains(checkAdd);
 	}
 
 	public void printSendPerms() {
