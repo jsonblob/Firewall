@@ -17,7 +17,6 @@ CLASSES = \
 	AccessControl.java \
 	Filter.java \
 	Worker.java \
-	Initializer.java \
 	Firewall.java \
 	LamportQueue.java \
 

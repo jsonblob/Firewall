@@ -219,38 +219,3 @@ class ParallelPacketWorker implements PacketWorker {
     }
   }  
 }
-
-class InitializerWorker implements PacketWorker {
-  PaddedPrimitiveNonVolatile<Boolean> done;
-  AccessControl ac;
-  int workerID;
-  LamportQueue[] queues;
-  public InitializerWorker(
-    PaddedPrimitiveNonVolatile<Boolean> done,
-    AccessControl ac,
-    int workerID,
-    LamportQueue[] queues
-  ) {
-    this.done = done;
-    this.ac = ac;
-    this.workerID = workerID;
-    this.queues = queues;
-  }
-
-  public void setConfig(Config conf) {
-    ac.setSendPerm(conf.address, conf.personaNonGrata);
-    ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
-  }
-  
-  public void run() {
-    Packet tmp;
-    while( !done.value ) {
-      try {
-        tmp = (Packet) queues[workerID].deq();
-        Config conf = tmp.config;
-        setConfig(conf);  
-      } catch (EmptyException e) {;}
-    }
-  }  
-}
-

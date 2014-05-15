@@ -38,11 +38,6 @@ class SerialFirewall {
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
 
-    System.out.println("Initialization Done");
-
-    // Initializer ini = new Initializer(pktGen, ac, total, numSources);
-    // ini.init();
-
     SerialFilter filter = new SerialFilter();
     PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
     PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
@@ -125,8 +120,6 @@ class ParallelSTMFirewall {
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPerm(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
-
-    System.out.println("Initialization Done");
 
     ParallelSTMFilter filter = new ParallelSTMFilter();
 
@@ -223,11 +216,6 @@ class ParallelFirewall {
         ac.setSendPerm(conf.address, conf.personaNonGrata);
         ac.setAcceptPermInit(conf.address, conf.addressBegin, conf.addressEnd, conf.acceptingRange);
     }
-
-    System.out.println("Initialization Done");
-
-    // Initializer ini = new Initializer(pktGen, ac, total, numSources);
-    // ini.init();
 
     ParallelFilter filter = new ParallelFilter();
 
